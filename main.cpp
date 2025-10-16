@@ -1,21 +1,34 @@
 #include <iostream>
 #include <vector>
 
+#define SHUFFLE_NBR (1000)
+
 struct Cell
 {
-    Cell() : flag(0), bomb(0), discover(1), number(2) {}
     bool flag;
     bool bomb;
     bool discover;
     int number;
+
+    Cell() : flag(0), bomb(0), discover(1), number(2) {}
+
+    void swap_with(Cell *cell)
+    {
+        Cell tmp = *this;
+        *this = *cell;
+        *cell = tmp;
+    }
 };
+
 /*
-      0 1 2 3 4 5 6 (i, width)
-    0 . . . . . . .
-    1 . . . . . . .
-    2 . . . . . . .
-    (j,
-    height)
+                   col
+                    |
+                    v
+              0 1 2 3 4 5 6 (width)
+            0 . . . . . . .
+    row --> 1 . . . . . . .     grid[col][row]
+            2 . . . . . . .
+        (height)
 */
 class Grid
 {
@@ -29,28 +42,52 @@ public:
     {
         for (int i = 0; i < width; i++)
         {
-            std::vector<Cell> row;
+            std::vector<Cell> col;
             for (int j = 0; j < height; j++)
             {
                 Cell cell;
-                row.push_back(cell);
+                col.push_back(cell);
             }
-            array.push_back(row);
+            array.push_back(col);
         }
     }
 
     // Add bomb randomly and give number to cells
     void init(int bomb_nbr)
     {
-        return;
+        if (bomb_nbr >= width * height)
+            exit(1);
+
+        // Fill bomb number needed
+        for (int i = 0; i < bomb_nbr; i++)
+        {
+            array.at(i / height).at(i % height).bomb = true;
+        }
+        this->shuffle();
     }
-    void toggle_flag();
-    void discover();
+
     std::vector<std::vector<Cell>> get_grid()
     {
         return array;
     }
+
+    void toggle_flag();
+    void discover();
     bool bomb_is_discover();
+
+private:
+    void shuffle()
+    {
+        srand((unsigned int)time(0));
+        for (int i = 0; i < SHUFFLE_NBR; i++)
+        {
+            int col1 = rand() % width;
+            int row1 = rand() % height;
+            int col2 = rand() % width;
+            int row2 = rand() % height;
+            array[col1][row1].swap_with(&array[col2][row2]);
+        }
+    }
 };
 
 struct Game
@@ -67,11 +104,11 @@ struct UI
     void display_grid(Grid grid)
     {
         std::vector<std::vector<Cell>> array = grid.get_grid();
-        for (int i = 0; i < grid.width; i++)
+        for (int i = 0; i < grid.height; i++)
         {
-            for (int j = 0; j < grid.height; j++)
+            for (int j = 0; j < grid.width; j++)
             {
-                Cell cell = array.at(i).at(j);
+                Cell cell = array.at(j).at(i);
                 if (cell.discover)
                 {
                     if (cell.bomb)
@@ -102,17 +139,20 @@ struct UI
 
 int main()
 {
+    int width = 20;
+    int height = 10;
+    int bomb_nbr = 20;
+
     Game game;
-    int width = 8;
-    int height = 5;
-    int bomb_nbr = 4;
     std::cout << "Welcome to minesweeper" << std::endl;
 
-    Grid grid(height, width); // Width, height, bomb
+    Grid grid(width, height);
     UI ui;
+
     ui.display_grid(grid);
     std::cout << std::endl;
     grid.init(bomb_nbr);
     ui.display_grid(grid);
+
     return 0;
 }
