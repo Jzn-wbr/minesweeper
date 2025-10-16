@@ -10,7 +10,7 @@ struct Cell
     bool discover;
     int number;
 
-    Cell() : flag(0), bomb(0), discover(1), number(2) {}
+    Cell() : flag(0), bomb(0), discover(1), number(0) {}
 
     void swap_with(Cell *cell)
     {
@@ -64,6 +64,7 @@ public:
             array.at(i / height).at(i % height).bomb = true;
         }
         this->shuffle();
+        this->assign_number();
     }
 
     std::vector<std::vector<Cell>> get_grid()
@@ -86,6 +87,60 @@ private:
             int col2 = rand() % width;
             int row2 = rand() % height;
             array[col1][row1].swap_with(&array[col2][row2]);
+        }
+    }
+
+    void assign_number()
+    {
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                Cell *c = &array.at(i).at(j); // Current cell
+                if (c->bomb)                  // Don't count for bomb cells
+                    continue;
+
+                if (!((i - 1 < 0) || (j - 1 < 0)))
+                {
+                    if (array.at(i - 1).at(j - 1).bomb)
+                        c->number++;
+                }
+                if (!(j - 1 < 0))
+                {
+                    if (array.at(i).at(j - 1).bomb)
+                        c->number++;
+                }
+                if (!((i + 1 >= width) || (j - 1 < 0)))
+                {
+                    if (array.at(i + 1).at(j - 1).bomb)
+                        c->number++;
+                }
+                if (!(i - 1 < 0))
+                {
+                    if (array.at(i - 1).at(j).bomb)
+                        c->number++;
+                }
+                if (!(i + 1 >= width))
+                {
+                    if (array.at(i + 1).at(j).bomb)
+                        c->number++;
+                }
+                if (!((i - 1 < 0) || (j + 1 >= height)))
+                {
+                    if (array.at(i - 1).at(j + 1).bomb)
+                        c->number++;
+                }
+                if (!(j + 1 >= height))
+                {
+                    if (array.at(i).at(j + 1).bomb)
+                        c->number++;
+                }
+                if (!((i + 1 >= width) || (j + 1 >= height)))
+                {
+                    if (array.at(i + 1).at(j + 1).bomb)
+                        c->number++;
+                }
+            }
         }
     }
 };
@@ -115,7 +170,7 @@ struct UI
                     {
                         std::cout << "b ";
                     }
-                    else if (cell.number)
+                    else
                     {
                         std::cout << cell.number << " ";
                     }
@@ -140,7 +195,7 @@ struct UI
 int main()
 {
     int width = 20;
-    int height = 10;
+    int height = 7;
     int bomb_nbr = 20;
 
     Game game;
