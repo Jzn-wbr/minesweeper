@@ -100,20 +100,37 @@ private:
                 if (c->bomb)                  // Don't count for bomb cells
                     continue;
 
-                if (!((i - 1 < 0) || (j - 1 < 0)))
-                {
-                    if (array.at(i - 1).at(j - 1).bomb)
-                        c->number++;
-                }
                 if (!(j - 1 < 0))
                 {
                     if (array.at(i).at(j - 1).bomb)
                         c->number++;
+
+                    if (!(i - 1 < 0))
+                    {
+                        if (array.at(i - 1).at(j - 1).bomb)
+                            c->number++;
+                    }
+                    if (!(i + 1 >= width))
+                    {
+                        if (array.at(i + 1).at(j - 1).bomb)
+                            c->number++;
+                    }
                 }
-                if (!((i + 1 >= width) || (j - 1 < 0)))
+                if (!(j + 1 >= height))
                 {
-                    if (array.at(i + 1).at(j - 1).bomb)
+                    if (array.at(i).at(j + 1).bomb)
                         c->number++;
+
+                    if (!(i + 1 >= width))
+                    {
+                        if (array.at(i + 1).at(j + 1).bomb)
+                            c->number++;
+                    }
+                    if (!(i - 1 < 0))
+                    {
+                        if (array.at(i - 1).at(j + 1).bomb)
+                            c->number++;
+                    }
                 }
                 if (!(i - 1 < 0))
                 {
@@ -123,21 +140,6 @@ private:
                 if (!(i + 1 >= width))
                 {
                     if (array.at(i + 1).at(j).bomb)
-                        c->number++;
-                }
-                if (!((i - 1 < 0) || (j + 1 >= height)))
-                {
-                    if (array.at(i - 1).at(j + 1).bomb)
-                        c->number++;
-                }
-                if (!(j + 1 >= height))
-                {
-                    if (array.at(i).at(j + 1).bomb)
-                        c->number++;
-                }
-                if (!((i + 1 >= width) || (j + 1 >= height)))
-                {
-                    if (array.at(i + 1).at(j + 1).bomb)
                         c->number++;
                 }
             }
@@ -158,34 +160,47 @@ struct UI
     void add_flag();
     void display_grid(Grid grid)
     {
+        for (int i = 0; i < grid.width; i++)
+        {
+            std::cout << " ── ";
+        }
+        std::cout << std::endl;
+
         std::vector<std::vector<Cell>> array = grid.get_grid();
         for (int i = 0; i < grid.height; i++)
         {
             for (int j = 0; j < grid.width; j++)
             {
+                std::cout << "|";
+
                 Cell cell = array.at(j).at(i);
                 if (cell.discover)
                 {
                     if (cell.bomb)
                     {
-                        std::cout << "b ";
+                        std::cout << " b ";
                     }
                     else
                     {
-                        std::cout << cell.number << " ";
+                        std::cout << " " << cell.number << " ";
                     }
                 }
                 else
                 {
                     if (cell.flag)
                     {
-                        std::cout << "f ";
+                        std::cout << " f ";
                     }
                     else
                     {
-                        std::cout << "  ";
+                        std::cout << "   ";
                     }
                 }
+            }
+            std::cout << "|" << std::endl;
+            for (int i = 0; i < grid.width; i++)
+            {
+                std::cout << " ── ";
             }
             std::cout << std::endl;
         }
@@ -195,8 +210,8 @@ struct UI
 int main()
 {
     int width = 20;
-    int height = 7;
-    int bomb_nbr = 20;
+    int height = 5;
+    int bomb_nbr = 15;
 
     Game game;
     std::cout << "Welcome to minesweeper" << std::endl;
@@ -204,8 +219,6 @@ int main()
     Grid grid(width, height);
     UI ui;
 
-    ui.display_grid(grid);
-    std::cout << std::endl;
     grid.init(bomb_nbr);
     ui.display_grid(grid);
 
