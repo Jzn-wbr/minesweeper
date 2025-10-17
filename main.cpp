@@ -89,6 +89,20 @@ public:
             {
                 discover(col, row - 1);
             }
+            if (!(col - 1 < 0))
+            {
+                if (!(array.at(col - 1).at(row - 1).discover || array.at(col - 1).at(row - 1).bomb))
+                {
+                    discover(col - 1, row - 1);
+                }
+            }
+            if (!(col + 1 >= width))
+            {
+                if (!(array.at(col + 1).at(row - 1).discover || array.at(col + 1).at(row - 1).bomb))
+                {
+                    discover(col + 1, row - 1);
+                }
+            }
         }
         if (!(col - 1 < 0))
         {
@@ -109,6 +123,20 @@ public:
             if (!(array.at(col).at(row + 1).discover || array.at(col).at(row + 1).bomb))
             {
                 discover(col, row + 1);
+            }
+            if (!(col - 1 < 0))
+            {
+                if (!(array.at(col - 1).at(row + 1).discover || array.at(col - 1).at(row + 1).bomb))
+                {
+                    discover(col - 1, row + 1);
+                }
+            }
+            if (!(col + 1 >= width))
+            {
+                if (!(array.at(col + 1).at(row + 1).discover || array.at(col + 1).at(row + 1).bomb))
+                {
+                    discover(col + 1, row + 1);
+                }
             }
         }
         return;
