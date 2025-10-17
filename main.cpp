@@ -258,8 +258,16 @@ struct Game
 
 struct UI
 {
-    void discover_cells();
-    void add_flag();
+    void discover_cells(Grid *grid, int col, int row)
+    {
+        grid->discover(col, row);
+    }
+
+    void toggle_flag(Grid *grid, int col, int row)
+    {
+        grid->toggle_flag(col, row);
+    }
+
     void display_grid(Grid grid)
     {
         for (int i = 0; i < grid.width; i++)
@@ -312,8 +320,8 @@ struct UI
 int main()
 {
     int width = 20;
-    int height = 5;
-    int bomb_nbr = 1;
+    int height = 4;
+    int bomb_nbr = 2;
 
     Game game;
     std::cout << "Welcome to minesweeper" << std::endl;
@@ -327,20 +335,25 @@ int main()
     {
         ui.display_grid(grid);
 
+        char option;
         int col, row;
-        std::cout << "Discover [col] >> ";
+        std::cout << "Options : discover [d], flag [f]" << std::endl;
+        std::cout << "[option] [col] [row] >> ";
+        std::cin >> option;
         std::cin >> col;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(),
-                        '\n'); // Clear buffer until '\n'
-        std::cout << std::endl;
-        std::cout << "Discover [row] >> ";
         std::cin >> row;
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(),
                         '\n'); // Clear buffer until '\n'
         std::cout << std::endl;
-        std::cout << "   " << col << "  " << row << std::endl;
 
-        grid.discover(col, row);
+        if (option == 'd')
+        {
+            ui.discover_cells(&grid, col, row);
+        }
+        if (option == 'f')
+        {
+            ui.toggle_flag(&grid, col, row);
+        }
     }
 
     if (game.get_state(grid) == "win")
