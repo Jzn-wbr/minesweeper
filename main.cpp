@@ -142,8 +142,23 @@ public:
         return;
     }
 
-    void toggle_flag();
-    bool bomb_is_discover();
+    void toggle_flag(int col, int row)
+    {
+        array.at(col).at(row).flag ^= true;
+    }
+
+    bool bomb_is_discover()
+    {
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                if (array.at(i).at(j).bomb && array.at(i).at(j).discover)
+                    return true;
+            }
+        }
+        return false;
+    }
 
 private:
     void shuffle()
@@ -218,7 +233,25 @@ private:
 
 struct Game
 {
-    std::string get_state();
+    std::string get_state(Grid grid)
+    {
+        bool remain = false;
+        std::vector<std::vector<Cell>> array = grid.get_grid();
+        for (int i = 0; i < grid.width; i++)
+        {
+            for (int j = 0; j < grid.height; j++)
+            {
+                if (array.at(i).at(j).bomb && array.at(i).at(j).discover)
+                    return "loss";
+                if (!array.at(i).at(j).bomb && !array.at(i).at(j).discover)
+                    remain = true;
+            }
+        }
+        if (remain)
+            return "ongoing";
+        return "win";
+    };
+
     std::string get_time();
     void run();
 };
@@ -280,7 +313,7 @@ int main()
 {
     int width = 20;
     int height = 5;
-    int bomb_nbr = 10;
+    int bomb_nbr = 1;
 
     Game game;
     std::cout << "Welcome to minesweeper" << std::endl;
@@ -290,7 +323,7 @@ int main()
 
     grid.init(bomb_nbr);
 
-    while (1)
+    while (game.get_state(grid) == "ongoing")
     {
         ui.display_grid(grid);
 
@@ -308,6 +341,15 @@ int main()
         std::cout << "   " << col << "  " << row << std::endl;
 
         grid.discover(col, row);
+    }
+
+    if (game.get_state(grid) == "win")
+    {
+        std::cout << "Gagné !" << std::endl;
+    }
+    else
+    {
+        std::cout << "Perdu !" << std::endl;
     }
 
     return 0;
