@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <limits>
 
 #define SHUFFLE_NBR (1000)
 
@@ -79,33 +80,33 @@ public:
 
         Cell *c = &array.at(col).at(row);
         c->discover = true;
-        if (c->bomb)
+        if (c->bomb || c->number)
             return;
 
         if (!(row - 1 < 0))
         {
-            if (!(array.at(col).at(row - 1).discover || array.at(col).at(row - 1).number))
+            if (!(array.at(col).at(row - 1).discover || array.at(col).at(row - 1).bomb))
             {
                 discover(col, row - 1);
             }
         }
         if (!(col - 1 < 0))
         {
-            if (!(array.at(col - 1).at(row).discover || array.at(col - 1).at(row).number))
+            if (!(array.at(col - 1).at(row).discover || array.at(col - 1).at(row).bomb))
             {
                 discover(col - 1, row);
             }
         }
         if (!(col + 1 >= width))
         {
-            if (!(array.at(col + 1).at(row).discover || array.at(col + 1).at(row).number))
+            if (!(array.at(col + 1).at(row).discover || array.at(col + 1).at(row).bomb))
             {
                 discover(col + 1, row);
             }
         }
         if (!(row + 1 >= height))
         {
-            if (!(array.at(col).at(row + 1).discover || array.at(col).at(row + 1).number))
+            if (!(array.at(col).at(row + 1).discover || array.at(col).at(row + 1).bomb))
             {
                 discover(col, row + 1);
             }
@@ -251,7 +252,7 @@ int main()
 {
     int width = 20;
     int height = 5;
-    int bomb_nbr = 2;
+    int bomb_nbr = 10;
 
     Game game;
     std::cout << "Welcome to minesweeper" << std::endl;
@@ -260,10 +261,26 @@ int main()
     UI ui;
 
     grid.init(bomb_nbr);
-    ui.display_grid(grid);
 
-    grid.discover(19, 4);
-    ui.display_grid(grid);
+    while (1)
+    {
+        ui.display_grid(grid);
+
+        int col, row;
+        std::cout << "Discover [col] >> ";
+        std::cin >> col;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(),
+                        '\n'); // Clear buffer until '\n'
+        std::cout << std::endl;
+        std::cout << "Discover [row] >> ";
+        std::cin >> row;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(),
+                        '\n'); // Clear buffer until '\n'
+        std::cout << std::endl;
+        std::cout << "   " << col << "  " << row << std::endl;
+
+        grid.discover(col, row);
+    }
 
     return 0;
 }
