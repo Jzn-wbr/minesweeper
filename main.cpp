@@ -10,7 +10,7 @@ struct Cell
     bool discover;
     int number;
 
-    Cell() : flag(0), bomb(0), discover(1), number(0) {}
+    Cell() : flag(0), bomb(0), discover(0), number(0) {}
 
     void swap_with(Cell *cell)
     {
@@ -55,7 +55,7 @@ public:
     // Add bomb randomly and give number to cells
     void init(int bomb_nbr)
     {
-        if (bomb_nbr >= width * height)
+        if (bomb_nbr >= width * height || bomb_nbr <= 0)
             exit(1);
 
         // Fill bomb number needed
@@ -72,8 +72,48 @@ public:
         return array;
     }
 
+    void discover(int col, int row)
+    {
+        if ((col < 0) || (col >= width) || (row < 0) || (row >= height))
+            return;
+
+        Cell *c = &array.at(col).at(row);
+        c->discover = true;
+        if (c->bomb)
+            return;
+
+        if (!(row - 1 < 0))
+        {
+            if (!(array.at(col).at(row - 1).discover || array.at(col).at(row - 1).number))
+            {
+                discover(col, row - 1);
+            }
+        }
+        if (!(col - 1 < 0))
+        {
+            if (!(array.at(col - 1).at(row).discover || array.at(col - 1).at(row).number))
+            {
+                discover(col - 1, row);
+            }
+        }
+        if (!(col + 1 >= width))
+        {
+            if (!(array.at(col + 1).at(row).discover || array.at(col + 1).at(row).number))
+            {
+                discover(col + 1, row);
+            }
+        }
+        if (!(row + 1 >= height))
+        {
+            if (!(array.at(col).at(row + 1).discover || array.at(col).at(row + 1).number))
+            {
+                discover(col, row + 1);
+            }
+        }
+        return;
+    }
+
     void toggle_flag();
-    void discover();
     bool bomb_is_discover();
 
 private:
@@ -211,7 +251,7 @@ int main()
 {
     int width = 20;
     int height = 5;
-    int bomb_nbr = 15;
+    int bomb_nbr = 2;
 
     Game game;
     std::cout << "Welcome to minesweeper" << std::endl;
@@ -220,6 +260,9 @@ int main()
     UI ui;
 
     grid.init(bomb_nbr);
+    ui.display_grid(grid);
+
+    grid.discover(19, 4);
     ui.display_grid(grid);
 
     return 0;
